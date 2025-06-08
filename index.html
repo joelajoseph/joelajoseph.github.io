@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Physics Machine</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+      <span class="nav-title logo-stacked" id="nav-home">
+        <span>The</span>
+        <span>Physics</span>
+        <span>Machine</span>
+      </span>
+      <div class="nav-links">
+        <a href="#" data-target="kinematics">Kinematics</a>
+        <a href="#" data-target="projectile">Projectile Motion</a>
+        <a href="#" data-target="energy">Energy</a>
+        <a href="#" data-target="momentum">Momentum</a>
+        <a href="#" data-target="collisions">Collisions</a>
+        <a href="#" data-target="unit-converter">Unit Converter</a>
+      </div>
+    </nav>
+
+    <section id="home" class="active">
+      <div class="section-container">
+        <div class="home-content">
+          <h1>Welcome to The Physics Machine</h1>
+          <p>Your interactive tool for physics calculations and unit conversions. 
+            Currently there is support for kinematics, energy, momentum, and collisions. 
+            In the future, other SPH4U topics will be added.</p>
+            <p> - Joel Joseph</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="kinematics">
+      <form id="kinematics-form" class="form-container">
+        <div class="calculator">
+          <h2>Kinematics Calculator</h2>
+          
+          <p>Enter 3 variables and the calculator will solve for the missing one</p>
+          <label for="solve-for">Solve for:</label>
+          <select id="solve-for" onchange="updateKinematicsInputs()">
+            <option value="v1">Initial velocity (v1)</option>
+            <option value="v2">Final velocity (v2)</option>
+            <option value="a">Acceleration (a)</option>
+            <option value="t">Time (t)</option>
+            <option value="d">Displacement (d)</option>
+          </select>
+
+          <div id="kinematics-inputs">
+            <label for="v1">Initial velocity (v₁):</label>
+            <input type="number" id="v1" name="v1" />
+            <label for="v2">Final velocity (v₂):</label>
+            <input type="number" id="v2" name="v2" />
+            <label for="a">Acceleration (a):</label>
+            <input type="number" id="a" name="a" />
+            <label for="t">Time (t):</label>
+            <input type="number" id="t" name="t" />
+            <label for="d">Displacement (d):</label>
+            <input type="number" id="d" name="d" />
+          </div>
+      
+          <label for="sigfigs">Significant Figures (optional):</label>
+          <input type="number" id="sigfigs" min="1" />
+          <button type="submit">Calculate</button>
+          <div id="result" class="result-display"></div>
+        </div>
+      </form>
+    </section>
+
+    <section id="projectile">
+      <form class="form-container" id="projectile-form">
+        <h2>Projectile Motion Calculator</h2>
+        <label for="proj-v0">Initial Velocity (m/s):</label>
+        <input type="number" id="proj-v0" name="proj-v0" />
+        <label for="proj-angle">Launch Angle (degrees):</label>
+        <input type="number" id="proj-angle" name="proj-angle" />
+        <label for="proj-h">Initial Height (m, optional):</label>
+        <input type="number" id="proj-h" name="proj-h" />
+        <label for="projectile-type">Solve for:</label>
+        <select id="projectile-type" name="projectile-type">
+          <option value="range">Range</option>
+          <option value="maxheight">Max Height</option>
+          <option value="time">Time of Flight</option>
+        </select>
+        <label for="sigfigs-projectile">Significant Figures (optional):</label>
+        <input type="number" id="sigfigs-projectile" min="1" />
+        <button type="submit">Calculate</button>
+        <div id="projectile-result" class="result-display"></div>
+        <div id="projectile-canvas-container" style="margin-top: 20px;"></div>
+      </form>
+    </section>
+
+    <section id="energy">
+      <form class="form-container" id="energy-form">
+        <h2>Energy Calculator</h2>
+        <label for="energy-type">Energy Type</label>
+        <select id="energy-type">
+          <option value="ke">Kinetic Energy (KE)</option>
+          <option value="gpe">Gravitational Potential Energy (GPE)</option>
+          <option value="epe">Elastic Potential Energy (EPE)</option>
+        </select>
+        <div id="energy-inputs"></div>
+        <label for="sigfigs-energy">Significant Figures (optional):</label>
+        <input type="number" id="sigfigs-energy" min="1" />
+        <button type="submit">Calculate</button>
+        <div id="energy-result" class="result-display"></div>
+      </form>
+    </section>
+
+    <section id="momentum">
+      <form class="form-container" id="momentum-form">
+        <h2>Momentum &amp; Impulse Calculator</h2>
+        <label for="momentum-type">Calculation Type</label>
+        <select id="momentum-type">
+          <option value="momentum">Momentum (p = mv)</option>
+          <option value="impulse">Impulse (J = FΔt)</option>
+        </select>
+        <div id="momentum-inputs"></div>
+        <label for="sigfigs-momentum">Significant Figures (optional):</label>
+        <input type="number" id="sigfigs-momentum" min="1" />
+        <button type="submit">Calculate</button>
+        <div id="momentum-result" class="result-display"></div>
+      </form>
+    </section>
+
+    <section id="collisions">
+      <form class="form-container" id="collisions-form">
+        <h2>Collisions Calculator</h2>
+        <label for="collision-type">Collision Type</label>
+        <select id="collision-type">
+          <option value="elastic">Elastic</option>
+          <option value="inelastic">Inelastic</option>
+        </select>
+        <div id="collisions-inputs">
+          <fieldset>
+            <legend>Object 1</legend>
+            <label for="c-mass1">Mass (m₁, kg):</label>
+            <input type="number" id="c-mass1" name="c-mass1" />
+            <label for="c-vel1">Velocity (v₁, m/s):</label>
+            <input type="number" id="c-vel1" name="c-vel1" />
+          </fieldset>
+          <fieldset>
+            <legend>Object 2</legend>
+            <label for="c-mass2">Mass (m₂, kg):</label>
+            <input type="number" id="c-mass2" name="c-mass2" />
+            <label for="c-vel2">Velocity (v₂, m/s):</label>
+            <input type="number" id="c-vel2" name="c-vel2" />
+          </fieldset>
+        </div>
+        <label for="sigfigs-collisions">Significant Figures (optional):</label>
+        <input type="number" id="sigfigs-collisions" min="1" />
+        <button type="submit">Calculate</button>
+        <div id="collisions-result" class="result-display"></div>
+      </form>
+    </section>
+
+    <section id="unit-converter">
+        <form class="form-container" id="converter-form">
+          <h2>Unit Converter</h2>
+          <label for="quantity-type">Quantity Type</label>
+          <select id="quantity-type">
+            <option value="distance">Distance / Displacement</option>
+            <option value="velocity">Velocity / Speed</option>
+            <option value="acceleration">Acceleration</option>
+            <option value="time">Time</option>
+          </select>
+      
+          <label for="input-value">Value</label>
+          <input type="number" id="input-value" />
+      
+          <label for="from-unit">From Unit</label>
+          <select id="from-unit"></select>
+      
+          <label for="to-unit">To Unit</label>
+          <select id="to-unit"></select>
+      
+          <label for="sigfigs-convert">Significant Figures (optional):</label>
+          <input type="number" id="sigfigs-convert" min="1" />
+          <button type="submit">Convert</button>
+          <div id="conversion-result" class="result-display"></div>
+        </form>
+      </section>
+
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  </body>
+</html>

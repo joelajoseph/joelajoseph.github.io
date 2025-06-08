@@ -1,0 +1,174 @@
+h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0px;
+  font-weight: 700;
+  font-size: 24px;
+  color: #333;
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+}
+body {
+  font-family: Inter, sans-serif;
+  padding: 20px;
+  background: #f4f4f4;
+  margin: 0;
+}
+
+nav {
+  background-color: black;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  border-radius: 9px;
+  margin: 20px auto;
+  max-width: 70vw;
+  border: 1px solid white;
+}
+
+.nav-links {
+  margin-left: auto;
+  display: flex;
+  gap: 30px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: transparent;
+}
+
+nav a:hover {
+  background-color: white;
+  color: black;
+}
+
+section {
+  display: none;
+  margin-bottom: 0;
+  padding: 32px 32px 24px 32px;
+  max-width: 90vw;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 12px;
+  position: relative;
+}
+
+section + section {
+  margin-top: 0;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0px;
+  font-weight: 700;
+  font-size: 24px;
+  color: #333;
+}
+
+p {
+  margin-bottom: 20px;
+}
+
+.form-container {
+  max-width: 70vw;
+  width: 100%;
+  margin: 0 auto; 
+  padding: 18px 22px 22px 22px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: none;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: normal;
+  font-family: Inter, sans-serif;
+}
+
+input {
+  font-family: Inter, sans-serif;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+select {
+  font-family: Inter, sans-serif;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+button {
+  font-family: Inter, sans-serif;
+  width: 100%;
+  padding: 10px;
+  background: #1e1e1e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background: #0b9243;
+}
+
+.result-display {
+  margin-top: 20px;
+  font-weight: bold;
+  font-size: 18px;
+  min-height: 24px;
+  color: #333;
+}
+
+/* #result {
+  margin-top: 20px;
+  font-weight: bold;
+  font-size: 18px;
+  min-height: 24px;
+} */
+
+.nav-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  font-family: Inter, sans-serif;
+  
+}
+
+.logo-stacked {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.logo-stacked span {
+  display: block;
+}
+
+.home-content {
+  max-width: 700px;
+  margin: 0 10vw;
+}
