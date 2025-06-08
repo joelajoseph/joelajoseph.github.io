@@ -1,145 +1,35 @@
-// --- PROJECTILE MOTION CALCULATOR LOGIC ---
-const projectileForm = document.getElementById("projectile-form");
-const projectileResultContainer = document.getElementById("projectile-result");
-const projectileTypeSelect = document.getElementById("projectile-type");
+// --- HOME PAGE LOGIC ---
+const navLinks = document.querySelectorAll(".nav-links a");
+const sections = document.querySelectorAll("section");
 
-function solveProjectile(event) {
-  if (event) event.preventDefault();
-  if (!projectileTypeSelect || !projectileResultContainer) return;
-  const type = projectileTypeSelect.value;
-  // Inputs: initial velocity (v0), angle (theta, degrees), initial height (h)
-  const v0 = parseFloat(document.getElementById("proj-v0")?.value);
-  const thetaDeg = parseFloat(document.getElementById("proj-angle")?.value);
-  const h = parseFloat(document.getElementById("proj-h")?.value);
-  let g = 9.8;
-  if (isNaN(g)) g = 9.8;
-  if ([v0, thetaDeg, h].some(x => isNaN(x))) {
-    projectileResultContainer.innerText = "Error: Please provide initial velocity, angle, and height.";
-    return;
-  }
-  const theta = thetaDeg * Math.PI / 180;
-  let result, units;
-  try {
-    if (type === "range") {
-      // Range with initial height: R = v0x * t_total, t_total = (v0y + sqrt(v0y^2 + 2gh))/g
-      const v0x = v0 * Math.cos(theta);
-      const v0y = v0 * Math.sin(theta);
-      const discrim = v0y * v0y + 2 * g * h;
-      if (discrim < 0) throw "Invalid values for range calculation.";
-      const t_total = (v0y + Math.sqrt(discrim)) / g;
-      result = v0x * t_total;
-      units = "m";
-    } else if (type === "maxheight") {
-      // Max height: h_max = h + (v0y^2)/(2g)
-      const v0y = v0 * Math.sin(theta);
-      result = h + (v0y * v0y) / (2 * g);
-      units = "m";
-    } else if (type === "time") {
-      // Time of flight: t_total = (v0y + sqrt(v0y^2 + 2gh))/g
-      const v0y = v0 * Math.sin(theta);
-      const discrim = v0y * v0y + 2 * g * h;
-      if (discrim < 0) throw "Invalid values for time calculation.";
-      result = (v0y + Math.sqrt(discrim)) / g;
-      units = "s";
-    } else {
-      throw "Invalid projectile calculation type.";
-    }
-  } catch (e) {
-    projectileResultContainer.innerText = `Error: ${e}`;
-    return;
-  }
-  if (isNaN(result)) {
-    projectileResultContainer.innerText = "Could not compute result.";
-    return;
-  }
-  const sigfig = parseInt(document.getElementById("sigfigs-projectile")?.value);
-  const formatted = !isNaN(sigfig) && sigfig > 0 ? Number(result).toPrecision(sigfig) : result.toFixed(2);
-  projectileResultContainer.innerText = `Result: ${formatted} ${units}`;
-  // Start projectile animation after successful calculation
-  startProjectileAnimation(v0, thetaDeg, h);
+function showSection(id) {
+  sections.forEach(section => {
+    section.style.display = section.id === id ? "block" : "none";
+  });
 }
 
-// Event listener for projectile calculator form submission
-if (projectileForm) {
-  projectileForm.addEventListener("submit", solveProjectile);
-}
-// --- MOMENTUM CALCULATOR LOGIC ---
-const momentumInputContainer = document.createElement("div");
-momentumInputContainer.id = "momentum-inputs";
-const momentumForm = document.getElementById("momentum-form");
-const momentumTypeSelect = document.getElementById("momentum-type");
-const momentumResultContainer = document.getElementById("momentum-result");
+navLinks.forEach(link => {
+  link.addEventListener("click", e => {
+    e.preventDefault();
+    const targetId = link.getAttribute("data-target");
+    showSection(targetId);
+  });
+});
 
-function updateMomentumInputs() {
-  if (!momentumTypeSelect || !momentumResultContainer) return;
-  const type = momentumTypeSelect.value;
-  const container = document.getElementById("momentum-inputs");
-  if (!container) return;
-  container.innerHTML = "";
-  function addInput(labelText, id, attrs = {}) {
-    const label = document.createElement("label");
-    label.setAttribute("for", id);
-    label.textContent = labelText;
-    const input = document.createElement("input");
-    input.type = "number";
-    input.id = id;
-    input.name = id;
-    Object.entries(attrs).forEach(([k, v]) => input.setAttribute(k, v));
-    container.appendChild(label);
-    container.appendChild(input);
-  }
-  if (type === "momentum") {
-    addInput("Mass (m, kg):", "momentum-m");
-    addInput("Velocity (v, m/s):", "momentum-v");
-  } else if (type === "impulse") {
-    addInput("Force (F, N):", "impulse-f");
-    addInput("Time Interval (Δt, s):", "impulse-t");
-  }
-  momentumResultContainer.innerHTML = "";
+const navHome = document.getElementById("nav-home");
+if (navHome) {
+  navHome.addEventListener("click", function(e) {
+    e.preventDefault();
+    showSection("home");
+  });
 }
 
-function solveMomentum(event) {
-  event.preventDefault();
-  if (!momentumTypeSelect || !momentumResultContainer) return;
-  const type = momentumTypeSelect.value;
-  let result, units;
-  try {
-    if (type === "momentum") {
-      const m = parseFloat(document.getElementById("momentum-m")?.value);
-      const v = parseFloat(document.getElementById("momentum-v")?.value);
-      if (isNaN(m) || isNaN(v)) throw "Please provide mass and velocity.";
-      result = m * v;
-      units = "kg·m/s";
-    } else if (type === "impulse") {
-      const f = parseFloat(document.getElementById("impulse-f")?.value);
-      const t = parseFloat(document.getElementById("impulse-t")?.value);
-      if (isNaN(f) || isNaN(t)) throw "Please provide force and time interval.";
-      result = f * t;
-      units = "N·s";
-    } else {
-      throw "Invalid calculation type.";
-    }
-  } catch (e) {
-    momentumResultContainer.innerText = `Error: ${e}`;
-    return;
-  }
-  if (isNaN(result)) {
-    momentumResultContainer.innerText = "Could not compute result.";
-    return;
-  }
-  const sigfig = parseInt(document.getElementById("sigfigs-momentum")?.value);
-  const formatted = !isNaN(sigfig) && sigfig > 0 ? Number(result).toPrecision(sigfig) : result.toFixed(2);
-  momentumResultContainer.innerText = `Result: ${formatted} ${units}`;
-}
+showSection("home");
 
-// Event listeners for momentum calculator
-momentumTypeSelect?.addEventListener("change", updateMomentumInputs);
-momentumForm?.addEventListener("submit", solveMomentum);
-if (typeof updateMomentumInputs === "function") updateMomentumInputs();
+// --- KINEMATICS CALCULATOR LOGIC ---
 const inputContainer = document.getElementById("kinematics-inputs");
 const resultContainer = document.getElementById("result");
 
-// Updating the required fields for kinematics calculator
 function updateKinematicsInputs() {
   const solveFor = document.getElementById("solve-for").value;
   const variables = ["v1", "v2", "a", "t", "d"];
@@ -167,7 +57,6 @@ function updateKinematicsInputs() {
   resultContainer.innerHTML = "";
 }
 
-// Kinematics Calculator
 function solveKinematics() {
   const solveFor = document.getElementById("solve-for").value;
   const values = {};
@@ -242,269 +131,77 @@ function solveKinematics() {
   resultContainer.innerText = `Result: ${formatted} ${units[solveFor] || ""}`;
 }
 
-// UNIT CONVERTER //
-
-const unitTypes = {
-  distance: { units: { m: 1, km: 1000, cm: 0.01, mm: 0.001, mi: 1609.34, ft: 0.3048, in: 0.0254 } },
-  velocity: { units: { "m/s": 1, "km/h": 1000 / 3600, "ft/s": 0.3048, "mph": 1609.34 / 3600 } },
-  acceleration: { units: { "m/s²": 1, "cm/s²": 0.01, "ft/s²": 0.3048 } },
-  time: { units: { s: 1, min: 60, h: 3600, ms: 0.001 } },
-};
-
-const quantitySelect = document.getElementById("quantity-type");
-const fromUnitSelect = document.getElementById("from-unit");
-const toUnitSelect = document.getElementById("to-unit");
-const inputValue = document.getElementById("input-value");
-const resultDisplay = document.getElementById("conversion-result");
-
-// Unit select menus for converter
-function populateUnitDropdowns() {
-  const type = quantitySelect.value;
-  const units = unitTypes[type].units;
-
-  fromUnitSelect.innerHTML = "";
-  toUnitSelect.innerHTML = "";
-
-  Object.keys(units).forEach(unit => {
-    const opt1 = document.createElement("option");
-    opt1.value = unit;
-    opt1.textContent = unit;
-    fromUnitSelect.appendChild(opt1);
-
-    const opt2 = document.createElement("option");
-    opt2.value = unit;
-    opt2.textContent = unit;
-    toUnitSelect.appendChild(opt2);
-  });
-}
-
-// Converter function
-function convertUnit(e) {
-  e.preventDefault();
-  const type = quantitySelect.value;
-  const fromUnit = fromUnitSelect.value;
-  const toUnit = toUnitSelect.value;
-  const value = parseFloat(inputValue.value);
-
-  if (isNaN(value)) {
-    resultDisplay.innerText = "Please enter a valid number.";
-    return;
-  }
-
-  const factorFrom = unitTypes[type].units[fromUnit];
-  const factorTo = unitTypes[type].units[toUnit];
-
-  const baseValue = value * factorFrom;
-  const converted = baseValue / factorTo;
-
-  const sigfig = parseInt(document.getElementById("sigfigs-convert").value);
-  const formatted = !isNaN(sigfig) && sigfig > 0 ? Number(converted).toPrecision(sigfig) : converted.toFixed(2);
-
-  resultDisplay.innerText = `${value} ${fromUnit} = ${formatted} ${toUnit}`;
-}
-
-// Event Listeners
-
-document.getElementById("solve-for").addEventListener("change", updateKinematicsInputs);
-document.getElementById("converter-form").addEventListener("submit", convertUnit);
-quantitySelect.addEventListener("change", populateUnitDropdowns);
-
 // Event listener for kinematics-form submission
 document.getElementById("kinematics-form")?.addEventListener("submit", function(event) {
   event.preventDefault();
   solveKinematics();
 });
 
-// ENERGY CALCULATOR LOGIC //
+// --- PROJECTILE MOTION CALCULATOR LOGIC ---
+const projectileForm = document.getElementById("projectile-form");
+const projectileResultContainer = document.getElementById("projectile-result");
+const projectileTypeSelect = document.getElementById("projectile-type");
 
-const energyInputContainer = document.getElementById("energy-inputs");
-const energyResultContainer = document.getElementById("energy-result");
-const energyTypeSelect = document.getElementById("energy-type");
-
-function updateEnergyInputs() {
-  if (!energyInputContainer || !energyTypeSelect) return;
-  const type = energyTypeSelect.value;
-  energyInputContainer.innerHTML = "";
-  // Helper to make label/input
-  function addInput(labelText, id, attrs = {}) {
-    const label = document.createElement("label");
-    label.setAttribute("for", id);
-    label.textContent = labelText;
-    const input = document.createElement("input");
-    input.type = "number";
-    input.id = id;
-    input.name = id;
-    Object.entries(attrs).forEach(([k, v]) => input.setAttribute(k, v));
-    energyInputContainer.appendChild(label);
-    energyInputContainer.appendChild(input);
+function solveProjectile(event) {
+  if (event) event.preventDefault();
+  if (!projectileTypeSelect || !projectileResultContainer) return;
+  const type = projectileTypeSelect.value;
+  // Inputs: initial velocity (v0), angle (theta, degrees), initial height (h)
+  const v0 = parseFloat(document.getElementById("proj-v0")?.value);
+  const thetaDeg = parseFloat(document.getElementById("proj-angle")?.value);
+  const h = parseFloat(document.getElementById("proj-h")?.value);
+  let g = 9.8;
+  if (isNaN(g)) g = 9.8;
+  if ([v0, thetaDeg, h].some(x => isNaN(x))) {
+    projectileResultContainer.innerText = "Error: Please provide initial velocity, angle, and height.";
+    return;
   }
-  if (type === "ke") {
-    addInput("Mass (m, kg):", "ke-m");
-    addInput("Velocity (v, m/s):", "ke-v");
-  } else if (type === "gpe") {
-    addInput("Mass (m, kg):", "gpe-m");
-    addInput("Height (h, m):", "gpe-h");
-    addInput("Gravitational Acceleration (g, m/s²):", "gpe-g", { value: "9.8" });
-  } else if (type === "epe") {
-    addInput("Spring Constant (k, N/m):", "epe-k");
-    addInput("Extension (x, m):", "epe-x");
-  }
-  energyResultContainer.innerHTML = "";
-}
-
-function solveEnergy(event) {
-  event.preventDefault();
-  if (!energyTypeSelect || !energyInputContainer || !energyResultContainer) return;
-  const type = energyTypeSelect.value;
-  let result, units = "J";
+  const theta = thetaDeg * Math.PI / 180;
+  let result, units;
   try {
-    if (type === "ke") {
-      const m = parseFloat(document.getElementById("ke-m")?.value);
-      const v = parseFloat(document.getElementById("ke-v")?.value);
-      if (isNaN(m) || isNaN(v)) throw "Please provide mass and velocity.";
-      result = 0.5 * m * v * v;
-    } else if (type === "gpe") {
-      const m = parseFloat(document.getElementById("gpe-m")?.value);
-      const h = parseFloat(document.getElementById("gpe-h")?.value);
-      let g = parseFloat(document.getElementById("gpe-g")?.value);
-      if (isNaN(m) || isNaN(h)) throw "Please provide mass and height.";
-      if (isNaN(g)) g = 9.8;
-      result = m * g * h;
-    } else if (type === "epe") {
-      const k = parseFloat(document.getElementById("epe-k")?.value);
-      const x = parseFloat(document.getElementById("epe-x")?.value);
-      if (isNaN(k) || isNaN(x)) throw "Please provide spring constant and extension.";
-      result = 0.5 * k * x * x;
+    if (type === "range") {
+      // Range with initial height: R = v0x * t_total, t_total = (v0y + sqrt(v0y^2 + 2gh))/g
+      const v0x = v0 * Math.cos(theta);
+      const v0y = v0 * Math.sin(theta);
+      const discrim = v0y * v0y + 2 * g * h;
+      if (discrim < 0) throw "Invalid values for range calculation.";
+      const t_total = (v0y + Math.sqrt(discrim)) / g;
+      result = v0x * t_total;
+      units = "m";
+    } else if (type === "maxheight") {
+      // Max height: h_max = h + (v0y^2)/(2g)
+      const v0y = v0 * Math.sin(theta);
+      result = h + (v0y * v0y) / (2 * g);
+      units = "m";
+    } else if (type === "time") {
+      // Time of flight: t_total = (v0y + sqrt(v0y^2 + 2gh))/g
+      const v0y = v0 * Math.sin(theta);
+      const discrim = v0y * v0y + 2 * g * h;
+      if (discrim < 0) throw "Invalid values for time calculation.";
+      result = (v0y + Math.sqrt(discrim)) / g;
+      units = "s";
     } else {
-      throw "Invalid energy type.";
+      throw "Invalid projectile calculation type.";
     }
   } catch (e) {
-    energyResultContainer.innerText = `Error: ${e}`;
+    projectileResultContainer.innerText = `Error: ${e}`;
     return;
   }
   if (isNaN(result)) {
-    energyResultContainer.innerText = "Could not compute result.";
+    projectileResultContainer.innerText = "Could not compute result.";
     return;
   }
-  const sigfig = parseInt(document.getElementById("sigfigs-energy")?.value);
+  const sigfig = parseInt(document.getElementById("sigfigs-projectile")?.value);
   const formatted = !isNaN(sigfig) && sigfig > 0 ? Number(result).toPrecision(sigfig) : result.toFixed(2);
-  energyResultContainer.innerText = `Result: ${formatted} ${units}`;
+  projectileResultContainer.innerText = `Result: ${formatted} ${units}`;
+  // Start projectile animation after successful calculation
+  startProjectileAnimation(v0, thetaDeg, h);
 }
 
-// Event listeners for energy calculator
-energyTypeSelect?.addEventListener("change", updateEnergyInputs);
-document.getElementById("energy-form")?.addEventListener("submit", solveEnergy);
-
-// Inits
-updateKinematicsInputs();
-populateUnitDropdowns();
-if (typeof updateEnergyInputs === "function") updateEnergyInputs();
-
-// COLLISIONS CALCULATOR LOGIC //
-
-const collisionInputContainer = document.getElementById("collisions-inputs");
-const collisionResultContainer = document.getElementById("collisions-result");
-const collisionTypeSelect = document.getElementById("collision-type");
-
-function updateCollisionInputs() {
-  if (!collisionInputContainer || !collisionTypeSelect) return;
-  const type = collisionTypeSelect.value;
-  collisionInputContainer.innerHTML = "";
-  function addInput(labelText, id, attrs = {}) {
-    const label = document.createElement("label");
-    label.setAttribute("for", id);
-    label.textContent = labelText;
-    const input = document.createElement("input");
-    input.type = "number";
-    input.id = id;
-    input.name = id;
-    Object.entries(attrs).forEach(([k, v]) => input.setAttribute(k, v));
-    collisionInputContainer.appendChild(label);
-    collisionInputContainer.appendChild(input);
-  }
-  // Inputs for two masses and their initial velocities
-  addInput("Mass 1 (m₁, kg):", "c-mass1");
-  addInput("Velocity 1 (v₁, m/s):", "c-vel1");
-  addInput("Mass 2 (m₂, kg):", "c-mass2");
-  addInput("Velocity 2 (v₂, m/s):", "c-vel2");
-  collisionResultContainer.innerHTML = "";
+// Event listener for projectile calculator form submission
+if (projectileForm) {
+  projectileForm.addEventListener("submit", solveProjectile);
 }
-
-function solveCollision(event) {
-  event.preventDefault();
-  if (!collisionTypeSelect || !collisionResultContainer) return;
-  const type = collisionTypeSelect.value;
-  let m1 = parseFloat(document.getElementById("c-mass1")?.value);
-  let v1 = parseFloat(document.getElementById("c-vel1")?.value);
-  let m2 = parseFloat(document.getElementById("c-mass2")?.value);
-  let v2 = parseFloat(document.getElementById("c-vel2")?.value);
-  if ([m1, v1, m2, v2].some(x => isNaN(x))) {
-    collisionResultContainer.innerText = "Error: Please provide all masses and velocities.";
-    return;
-  }
-  let v1Final, v2Final;
-  try {
-    if (type === "elastic") {
-      // Elastic collision formulas for final velocities
-      v1Final = ((m1 - m2) / (m1 + m2)) * v1 + (2 * m2 / (m1 + m2)) * v2;
-      v2Final = (2 * m1 / (m1 + m2)) * v1 + ((m2 - m1) / (m1 + m2)) * v2;
-    } else if (type === "inelastic") {
-      // Perfectly inelastic collision: bodies stick together
-      const vFinal = (m1 * v1 + m2 * v2) / (m1 + m2);
-      v1Final = vFinal;
-      v2Final = vFinal;
-    } else {
-      throw "Invalid collision type.";
-    }
-  } catch (e) {
-    collisionResultContainer.innerText = `Error: ${e}`;
-    return;
-  }
-  const sigfig = parseInt(document.getElementById("sigfigs-collisions")?.value);
-  const format = val => (!isNaN(sigfig) && sigfig > 0) ? Number(val).toPrecision(sigfig) : val.toFixed(2);
-  collisionResultContainer.innerText = `Final velocities:\nv₁' = ${format(v1Final)} m/s\nv₂' = ${format(v2Final)} m/s`;
-}
-
-// Event listeners for collisions calculator
-collisionTypeSelect?.addEventListener("change", updateCollisionInputs);
-document.getElementById("collisions-form")?.addEventListener("submit", function(e) {
-  e.preventDefault();
-  solveCollision(e);
-});
-
-// Inits for collision inputs
-if (typeof updateCollisionInputs === "function") updateCollisionInputs();
-
-
-// Section Toggles
-const navLinks = document.querySelectorAll(".nav-links a");
-const sections = document.querySelectorAll("section");
-
-function showSection(id) {
-  sections.forEach(section => {
-    section.style.display = section.id === id ? "block" : "none";
-  });
-}
-
-navLinks.forEach(link => {
-  link.addEventListener("click", e => {
-    e.preventDefault();
-    const targetId = link.getAttribute("data-target");
-    showSection(targetId);
-  });
-});
-
-// Add click event for nav-home to show home section
-const navHome = document.getElementById("nav-home");
-if (navHome) {
-  navHome.addEventListener("click", function(e) {
-    e.preventDefault();
-    showSection("home");
-  });
-}
-
-// Show only the home section by default
-showSection("home");
 
 // --- PROJECTILE MOTION ANIMATION (p5.js) ---
 // Animation variables
@@ -627,3 +324,303 @@ function startProjectileAnimation(v0, thetaDeg, h) {
     };
   });
 }
+
+// --- ENERGY CALCULATOR LOGIC ---
+// Existing energy calculator code remains here...
+
+const energyInputContainer = document.getElementById("energy-inputs");
+const energyResultContainer = document.getElementById("energy-result");
+const energyTypeSelect = document.getElementById("energy-type");
+
+function updateEnergyInputs() {
+  if (!energyInputContainer || !energyTypeSelect) return;
+  const type = energyTypeSelect.value;
+  energyInputContainer.innerHTML = "";
+  // Helper to make label/input
+  function addInput(labelText, id, attrs = {}) {
+    const label = document.createElement("label");
+    label.setAttribute("for", id);
+    label.textContent = labelText;
+    const input = document.createElement("input");
+    input.type = "number";
+    input.id = id;
+    input.name = id;
+    Object.entries(attrs).forEach(([k, v]) => input.setAttribute(k, v));
+    energyInputContainer.appendChild(label);
+    energyInputContainer.appendChild(input);
+  }
+  if (type === "ke") {
+    addInput("Mass (m, kg):", "ke-m");
+    addInput("Velocity (v, m/s):", "ke-v");
+  } else if (type === "gpe") {
+    addInput("Mass (m, kg):", "gpe-m");
+    addInput("Height (h, m):", "gpe-h");
+    addInput("Gravitational Acceleration (g, m/s²):", "gpe-g", { value: "9.8" });
+  } else if (type === "epe") {
+    addInput("Spring Constant (k, N/m):", "epe-k");
+    addInput("Extension (x, m):", "epe-x");
+  }
+  energyResultContainer.innerHTML = "";
+}
+
+function solveEnergy(event) {
+  event.preventDefault();
+  if (!energyTypeSelect || !energyInputContainer || !energyResultContainer) return;
+  const type = energyTypeSelect.value;
+  let result, units = "J";
+  try {
+    if (type === "ke") {
+      const m = parseFloat(document.getElementById("ke-m")?.value);
+      const v = parseFloat(document.getElementById("ke-v")?.value);
+      if (isNaN(m) || isNaN(v)) throw "Please provide mass and velocity.";
+      result = 0.5 * m * v * v;
+    } else if (type === "gpe") {
+      const m = parseFloat(document.getElementById("gpe-m")?.value);
+      const h = parseFloat(document.getElementById("gpe-h")?.value);
+      let g = parseFloat(document.getElementById("gpe-g")?.value);
+      if (isNaN(m) || isNaN(h)) throw "Please provide mass and height.";
+      if (isNaN(g)) g = 9.8;
+      result = m * g * h;
+    } else if (type === "epe") {
+      const k = parseFloat(document.getElementById("epe-k")?.value);
+      const x = parseFloat(document.getElementById("epe-x")?.value);
+      if (isNaN(k) || isNaN(x)) throw "Please provide spring constant and extension.";
+      result = 0.5 * k * x * x;
+    } else {
+      throw "Invalid energy type.";
+    }
+  } catch (e) {
+    energyResultContainer.innerText = `Error: ${e}`;
+    return;
+  }
+  if (isNaN(result)) {
+    energyResultContainer.innerText = "Could not compute result.";
+    return;
+  }
+  const sigfig = parseInt(document.getElementById("sigfigs-energy")?.value);
+  const formatted = !isNaN(sigfig) && sigfig > 0 ? Number(result).toPrecision(sigfig) : result.toFixed(2);
+  energyResultContainer.innerText = `Result: ${formatted} ${units}`;
+}
+
+// Event listeners for energy calculator
+energyTypeSelect?.addEventListener("change", updateEnergyInputs);
+document.getElementById("energy-form")?.addEventListener("submit", solveEnergy);
+
+// Inits
+updateKinematicsInputs();
+populateUnitDropdowns();
+if (typeof updateEnergyInputs === "function") updateEnergyInputs();
+
+// --- MOMENTUM CALCULATOR LOGIC ---
+const momentumInputContainer = document.createElement("div");
+momentumInputContainer.id = "momentum-inputs";
+const momentumForm = document.getElementById("momentum-form");
+const momentumTypeSelect = document.getElementById("momentum-type");
+const momentumResultContainer = document.getElementById("momentum-result");
+
+function updateMomentumInputs() {
+  if (!momentumTypeSelect || !momentumResultContainer) return;
+  const type = momentumTypeSelect.value;
+  const container = document.getElementById("momentum-inputs");
+  if (!container) return;
+  container.innerHTML = "";
+  function addInput(labelText, id, attrs = {}) {
+    const label = document.createElement("label");
+    label.setAttribute("for", id);
+    label.textContent = labelText;
+    const input = document.createElement("input");
+    input.type = "number";
+    input.id = id;
+    input.name = id;
+    Object.entries(attrs).forEach(([k, v]) => input.setAttribute(k, v));
+    container.appendChild(label);
+    container.appendChild(input);
+  }
+  if (type === "momentum") {
+    addInput("Mass (m, kg):", "momentum-m");
+    addInput("Velocity (v, m/s):", "momentum-v");
+  } else if (type === "impulse") {
+    addInput("Force (F, N):", "impulse-f");
+    addInput("Time Interval (Δt, s):", "impulse-t");
+  }
+  momentumResultContainer.innerHTML = "";
+}
+
+function solveMomentum(event) {
+  event.preventDefault();
+  if (!momentumTypeSelect || !momentumResultContainer) return;
+  const type = momentumTypeSelect.value;
+  let result, units;
+  try {
+    if (type === "momentum") {
+      const m = parseFloat(document.getElementById("momentum-m")?.value);
+      const v = parseFloat(document.getElementById("momentum-v")?.value);
+      if (isNaN(m) || isNaN(v)) throw "Please provide mass and velocity.";
+      result = m * v;
+      units = "kg·m/s";
+    } else if (type === "impulse") {
+      const f = parseFloat(document.getElementById("impulse-f")?.value);
+      const t = parseFloat(document.getElementById("impulse-t")?.value);
+      if (isNaN(f) || isNaN(t)) throw "Please provide force and time interval.";
+      result = f * t;
+      units = "N·s";
+    } else {
+      throw "Invalid calculation type.";
+    }
+  } catch (e) {
+    momentumResultContainer.innerText = `Error: ${e}`;
+    return;
+  }
+  if (isNaN(result)) {
+    momentumResultContainer.innerText = "Could not compute result.";
+    return;
+  }
+  const sigfig = parseInt(document.getElementById("sigfigs-momentum")?.value);
+  const formatted = !isNaN(sigfig) && sigfig > 0 ? Number(result).toPrecision(sigfig) : result.toFixed(2);
+  momentumResultContainer.innerText = `Result: ${formatted} ${units}`;
+}
+
+// Event listeners for momentum calculator
+momentumTypeSelect?.addEventListener("change", updateMomentumInputs);
+momentumForm?.addEventListener("submit", solveMomentum);
+if (typeof updateMomentumInputs === "function") updateMomentumInputs();
+
+
+// --- COLLISIONS CALCULATOR LOGIC ---
+const collisionInputContainer = document.getElementById("collisions-inputs");
+const collisionResultContainer = document.getElementById("collisions-result");
+const collisionTypeSelect = document.getElementById("collision-type");
+
+function updateCollisionInputs() {
+  if (!collisionInputContainer || !collisionTypeSelect) return;
+  const type = collisionTypeSelect.value;
+  collisionInputContainer.innerHTML = "";
+  function addInput(labelText, id, attrs = {}) {
+    const label = document.createElement("label");
+    label.setAttribute("for", id);
+    label.textContent = labelText;
+    const input = document.createElement("input");
+    input.type = "number";
+    input.id = id;
+    input.name = id;
+    Object.entries(attrs).forEach(([k, v]) => input.setAttribute(k, v));
+    collisionInputContainer.appendChild(label);
+    collisionInputContainer.appendChild(input);
+  }
+  // Inputs for two masses and their initial velocities
+  addInput("Mass 1 (m₁, kg):", "c-mass1");
+  addInput("Velocity 1 (v₁, m/s):", "c-vel1");
+  addInput("Mass 2 (m₂, kg):", "c-mass2");
+  addInput("Velocity 2 (v₂, m/s):", "c-vel2");
+  collisionResultContainer.innerHTML = "";
+}
+
+function solveCollision(event) {
+  event.preventDefault();
+  if (!collisionTypeSelect || !collisionResultContainer) return;
+  const type = collisionTypeSelect.value;
+  let m1 = parseFloat(document.getElementById("c-mass1")?.value);
+  let v1 = parseFloat(document.getElementById("c-vel1")?.value);
+  let m2 = parseFloat(document.getElementById("c-mass2")?.value);
+  let v2 = parseFloat(document.getElementById("c-vel2")?.value);
+  if ([m1, v1, m2, v2].some(x => isNaN(x))) {
+    collisionResultContainer.innerText = "Error: Please provide all masses and velocities.";
+    return;
+  }
+  let v1Final, v2Final;
+  try {
+    if (type === "elastic") {
+      // Elastic collision formulas for final velocities
+      v1Final = ((m1 - m2) / (m1 + m2)) * v1 + (2 * m2 / (m1 + m2)) * v2;
+      v2Final = (2 * m1 / (m1 + m2)) * v1 + ((m2 - m1) / (m1 + m2)) * v2;
+    } else if (type === "inelastic") {
+      // Perfectly inelastic collision: bodies stick together
+      const vFinal = (m1 * v1 + m2 * v2) / (m1 + m2);
+      v1Final = vFinal;
+      v2Final = vFinal;
+    } else {
+      throw "Invalid collision type.";
+    }
+  } catch (e) {
+    collisionResultContainer.innerText = `Error: ${e}`;
+    return;
+  }
+  const sigfig = parseInt(document.getElementById("sigfigs-collisions")?.value);
+  const format = val => (!isNaN(sigfig) && sigfig > 0) ? Number(val).toPrecision(sigfig) : val.toFixed(2);
+  collisionResultContainer.innerText = `Final velocities:\nv₁' = ${format(v1Final)} m/s\nv₂' = ${format(v2Final)} m/s`;
+}
+
+// Event listeners for collisions calculator
+collisionTypeSelect?.addEventListener("change", updateCollisionInputs);
+document.getElementById("collisions-form")?.addEventListener("submit", function(e) {
+  e.preventDefault();
+  solveCollision(e);
+});
+
+// Inits for collision inputs
+if (typeof updateCollisionInputs === "function") updateCollisionInputs();
+
+// --- UNIT CONVERTER LOGIC ---
+const unitTypes = {
+  distance: { units: { m: 1, km: 1000, cm: 0.01, mm: 0.001, mi: 1609.34, ft: 0.3048, in: 0.0254 } },
+  velocity: { units: { "m/s": 1, "km/h": 1000 / 3600, "ft/s": 0.3048, "mph": 1609.34 / 3600 } },
+  acceleration: { units: { "m/s²": 1, "cm/s²": 0.01, "ft/s²": 0.3048 } },
+  time: { units: { s: 1, min: 60, h: 3600, ms: 0.001 } },
+};
+
+const quantitySelect = document.getElementById("quantity-type");
+const fromUnitSelect = document.getElementById("from-unit");
+const toUnitSelect = document.getElementById("to-unit");
+const inputValue = document.getElementById("input-value");
+const resultDisplay = document.getElementById("conversion-result");
+
+// Unit select menus for converter
+function populateUnitDropdowns() {
+  const type = quantitySelect.value;
+  const units = unitTypes[type].units;
+
+  fromUnitSelect.innerHTML = "";
+  toUnitSelect.innerHTML = "";
+
+  Object.keys(units).forEach(unit => {
+    const opt1 = document.createElement("option");
+    opt1.value = unit;
+    opt1.textContent = unit;
+    fromUnitSelect.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = unit;
+    opt2.textContent = unit;
+    toUnitSelect.appendChild(opt2);
+  });
+}
+
+// Converter function
+function convertUnit(e) {
+  e.preventDefault();
+  const type = quantitySelect.value;
+  const fromUnit = fromUnitSelect.value;
+  const toUnit = toUnitSelect.value;
+  const value = parseFloat(inputValue.value);
+
+  if (isNaN(value)) {
+    resultDisplay.innerText = "Please enter a valid number.";
+    return;
+  }
+
+  const factorFrom = unitTypes[type].units[fromUnit];
+  const factorTo = unitTypes[type].units[toUnit];
+
+  const baseValue = value * factorFrom;
+  const converted = baseValue / factorTo;
+
+  const sigfig = parseInt(document.getElementById("sigfigs-convert").value);
+  const formatted = !isNaN(sigfig) && sigfig > 0 ? Number(converted).toPrecision(sigfig) : converted.toFixed(2);
+
+  resultDisplay.innerText = `${value} ${fromUnit} = ${formatted} ${toUnit}`;
+}
+
+// Event Listeners
+document.getElementById("solve-for").addEventListener("change", updateKinematicsInputs);
+document.getElementById("converter-form").addEventListener("submit", convertUnit);
+quantitySelect.addEventListener("change", populateUnitDropdowns);
