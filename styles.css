@@ -172,3 +172,20 @@ button:hover {
   max-width: 700px;
   margin: 0 10vw;
 }
+
+fieldset {
+  background: #fff;
+  border: 1.5px solid #ccc;
+  padding: 18px 20px 18px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+legend {
+  font-family: Inter, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+  padding: 0 6px;
+}

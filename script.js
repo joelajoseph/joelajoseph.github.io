@@ -326,8 +326,6 @@ function startProjectileAnimation(v0, thetaDeg, h) {
 }
 
 // --- ENERGY CALCULATOR LOGIC ---
-// Existing energy calculator code remains here...
-
 const energyInputContainer = document.getElementById("energy-inputs");
 const energyResultContainer = document.getElementById("energy-result");
 const energyTypeSelect = document.getElementById("energy-type");
@@ -336,7 +334,7 @@ function updateEnergyInputs() {
   if (!energyInputContainer || !energyTypeSelect) return;
   const type = energyTypeSelect.value;
   energyInputContainer.innerHTML = "";
-  // Helper to make label/input
+
   function addInput(labelText, id, attrs = {}) {
     const label = document.createElement("label");
     label.setAttribute("for", id);
@@ -349,6 +347,7 @@ function updateEnergyInputs() {
     energyInputContainer.appendChild(label);
     energyInputContainer.appendChild(input);
   }
+
   if (type === "ke") {
     addInput("Mass (m, kg):", "ke-m");
     addInput("Velocity (v, m/s):", "ke-v");
@@ -360,6 +359,7 @@ function updateEnergyInputs() {
     addInput("Spring Constant (k, N/m):", "epe-k");
     addInput("Extension (x, m):", "epe-x");
   }
+
   energyResultContainer.innerHTML = "";
 }
 
@@ -406,24 +406,19 @@ function solveEnergy(event) {
 energyTypeSelect?.addEventListener("change", updateEnergyInputs);
 document.getElementById("energy-form")?.addEventListener("submit", solveEnergy);
 
-// Inits
-updateKinematicsInputs();
-populateUnitDropdowns();
+// Initialize energy inputs on page load
 if (typeof updateEnergyInputs === "function") updateEnergyInputs();
 
 // --- MOMENTUM CALCULATOR LOGIC ---
-const momentumInputContainer = document.createElement("div");
-momentumInputContainer.id = "momentum-inputs";
-const momentumForm = document.getElementById("momentum-form");
-const momentumTypeSelect = document.getElementById("momentum-type");
+const momentumInputContainer = document.getElementById("momentum-inputs");
 const momentumResultContainer = document.getElementById("momentum-result");
+const momentumTypeSelect = document.getElementById("momentum-type");
 
 function updateMomentumInputs() {
-  if (!momentumTypeSelect || !momentumResultContainer) return;
+  if (!momentumInputContainer || !momentumTypeSelect) return;
   const type = momentumTypeSelect.value;
-  const container = document.getElementById("momentum-inputs");
-  if (!container) return;
-  container.innerHTML = "";
+  momentumInputContainer.innerHTML = "";
+
   function addInput(labelText, id, attrs = {}) {
     const label = document.createElement("label");
     label.setAttribute("for", id);
@@ -433,9 +428,10 @@ function updateMomentumInputs() {
     input.id = id;
     input.name = id;
     Object.entries(attrs).forEach(([k, v]) => input.setAttribute(k, v));
-    container.appendChild(label);
-    container.appendChild(input);
+    momentumInputContainer.appendChild(label);
+    momentumInputContainer.appendChild(input);
   }
+
   if (type === "momentum") {
     addInput("Mass (m, kg):", "momentum-m");
     addInput("Velocity (v, m/s):", "momentum-v");
@@ -443,6 +439,7 @@ function updateMomentumInputs() {
     addInput("Force (F, N):", "impulse-f");
     addInput("Time Interval (Δt, s):", "impulse-t");
   }
+
   momentumResultContainer.innerHTML = "";
 }
 
@@ -482,9 +479,10 @@ function solveMomentum(event) {
 
 // Event listeners for momentum calculator
 momentumTypeSelect?.addEventListener("change", updateMomentumInputs);
-momentumForm?.addEventListener("submit", solveMomentum);
-if (typeof updateMomentumInputs === "function") updateMomentumInputs();
+document.getElementById("momentum-form")?.addEventListener("submit", solveMomentum);
 
+// Initialize momentum inputs on page load
+if (typeof updateMomentumInputs === "function") updateMomentumInputs();
 
 // --- COLLISIONS CALCULATOR LOGIC ---
 const collisionInputContainer = document.getElementById("collisions-inputs");
